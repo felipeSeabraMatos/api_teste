@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -15,29 +16,39 @@ import java.time.LocalDate;
 @Table(name = "tb_cliente")
 public class Cliente {
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   @Column(name = "id", nullable = false)
-    private Long id;
-    @Column(name = "ds_nome", nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false)
+    private UUID id;
+
+    @Column(name = "ds_nome", length = 150, nullable = false)
     private String nome;
-    @Column(name = "ds_cidade", nullable = false)
+
+    @Column(name = "ds_sexo", length = 100, nullable = false)
+    private String sexo;
+
+    @Column(name = "ds_cidade", length = 100, nullable = false)
     private String cidade;
-    @Column(name = "ds_estado", nullable = false)
+
+    @Column(name = "ds_estado", length = 2, nullable = false)
     private String estado;
-    @Transient
+
+    @Column(name = "ds_documento", length = 14 , nullable = false)
     private String documento;
-    @Transient
+
+    @Column(name = "dt_cadastro", nullable = false)
     private LocalDate dataCadastro;
-    @Transient
+
+    @Column(name = "dt_alteracao")
     private LocalDate dataAlteracao;
-    @Transient
-    private Integer codigoArea;
-    @Transient
+
+    @Column(name = "nu_ddd", length = 3)
+    private String codigoArea;
+
+    @Column(name = "nu_telefone", length = 9)
     private Integer telefone;
-    @Transient
+
+    @Column(name = "bo-ativo", length = 1, nullable = false)
     private Boolean ativo;
-
-
 
 }

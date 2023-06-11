@@ -3,35 +3,90 @@ package com.apiteste.apiteste.services;
 import com.apiteste.apiteste.model.Cliente;
 import com.apiteste.apiteste.repository.ClienteRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.channels.FileChannel;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
+@Log4j2
 public class ClienteService {
 
     @Autowired
     private ClienteRepository clienteRepository;
 
-
     public List<Cliente> buscarClientes() {
-
         return clienteRepository.findAll();
     }
 
-    @Transactional
-    public Cliente cadastrarClientes(Cliente cliente) {
+    public Optional<Cliente> buscarClientePorNome(String nome) {
+        return clienteRepository.findByNomeContaining(nome);
+    }
 
-        var clientExistenteBanco = clienteRepository.findByNome(cliente.getNome());
+    public  Optional<Cliente> buscarClientePorId(UUID clienteId) {
+        return clienteRepository.findById(clienteId);
+    }
+
+    @Transactional
+    public Cliente cadastrarCliente(Cliente cliente) {
+
+        var clientExistenteBanco = clienteRepository.findByNomeContaining(cliente.getNome());
         var clienteCadastrado = new Cliente();
 
-        if(Objects.isNull(clientExistenteBanco)){
+        if(!clientExistenteBanco.isPresent()){
+            cliente.setDataCadastro(LocalDate.now());
+            cliente.setAtivo(Boolean.TRUE);
             clienteCadastrado = clienteRepository.save(cliente);
         }
 
         return clienteCadastrado;
 
     }
+
+    @Transactional
+    public Cliente atualizarCliente(UUID clienteId, Cliente cliente) {
+        var clienteAtualizado = new Cliente();
+        var clienteExistenteBanco = clienteRepository.findById(clienteId);
+
+        if (clienteRepository.existsById(clienteId)) {
+            cliente.setId(clienteId);
+            cliente.setDataCadastro(clienteExistenteBanco.get().getDataCadastro());
+            cliente.setAtivo(clienteExistenteBanco.get().getAtivo());
+            cliente.setDataAlteracao(LocalDate.now());
+            clienteAtualizado = clienteRepository.save(cliente);
+        }
+
+        return clienteAtualizado;
+    }
+
+    @Transactional
+    public Cliente ativarOuInativarCliente(UUID clienteId, Cliente cliente) {
+        var clienteAtualizado = new Cliente();
+        var clienteExistenteBanco = clienteRepository.findById(clienteId).get();
+
+         if (buscarClienteExistentePorId(clienteId)) {
+            clienteExistenteBanco.setAtivo(cliente.getAtivo().equals(Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE);
+            clienteExistenteBanco.setDataAlteracao(LocalDate.now());
+            clienteAtualizado = clienteRepository.save(clienteExistenteBanco);
+        }
+
+        return clienteAtualizado;
+    }
+
+    @Transactional
+    public void excluir(UUID clienteId) {
+        if(buscarClienteExistentePorId(clienteId)){
+            clienteRepository.deleteById(clienteId);
+        }
+     }
+
+    private boolean buscarClienteExistentePorId(UUID clienteId) {
+        return clienteRepository.existsById(clienteId);
+    }
+
 }
