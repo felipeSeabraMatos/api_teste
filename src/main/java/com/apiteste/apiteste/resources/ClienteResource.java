@@ -46,10 +46,10 @@ public class ClienteResource {
         return ResponseEntity.ok(clienteService.atualizarCliente(clienteId, cliente));
     }
 
-    @PatchMapping("/alterar-status/{clienteId}")
+    @PatchMapping("/alterar-status/{clienteId}/{status}")
     public ResponseEntity<Cliente> atualizarStatus(@PathVariable UUID clienteId,
-                                             @RequestBody Cliente cliente) {
-        return ResponseEntity.ok(clienteService.ativarOuInativarCliente(clienteId, cliente));
+                                            @PathVariable Boolean status) {
+        return ResponseEntity.ok(clienteService.ativarOuInativarCliente(clienteId, status));
     }
 
     @DeleteMapping("/{clienteId}")

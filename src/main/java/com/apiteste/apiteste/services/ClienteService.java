@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.channels.FileChannel;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,7 +40,7 @@ public class ClienteService {
         var clienteCadastrado = new Cliente();
 
         if(!clientExistenteBanco.isPresent()){
-            cliente.setDataCadastro(LocalDate.now());
+            cliente.setDataCadastro(OffsetDateTime.now());
             cliente.setAtivo(Boolean.TRUE);
             clienteCadastrado = clienteRepository.save(cliente);
         }
@@ -57,7 +58,7 @@ public class ClienteService {
             cliente.setId(clienteId);
             cliente.setDataCadastro(clienteExistenteBanco.get().getDataCadastro());
             cliente.setAtivo(clienteExistenteBanco.get().getAtivo());
-            cliente.setDataAlteracao(LocalDate.now());
+            cliente.setDataAlteracao(OffsetDateTime.now());
             clienteAtualizado = clienteRepository.save(cliente);
         }
 
@@ -65,13 +66,13 @@ public class ClienteService {
     }
 
     @Transactional
-    public Cliente ativarOuInativarCliente(UUID clienteId, Cliente cliente) {
+    public Cliente ativarOuInativarCliente(UUID clienteId, Boolean status) {
         var clienteAtualizado = new Cliente();
         var clienteExistenteBanco = clienteRepository.findById(clienteId).get();
 
          if (buscarClienteExistentePorId(clienteId)) {
-            clienteExistenteBanco.setAtivo(cliente.getAtivo().equals(Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE);
-            clienteExistenteBanco.setDataAlteracao(LocalDate.now());
+            clienteExistenteBanco.setAtivo(status);
+            clienteExistenteBanco.setDataAlteracao(OffsetDateTime.now());
             clienteAtualizado = clienteRepository.save(clienteExistenteBanco);
         }
 
