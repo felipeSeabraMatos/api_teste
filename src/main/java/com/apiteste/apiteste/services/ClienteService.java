@@ -1,5 +1,6 @@
 package com.apiteste.apiteste.services;
 
+import com.apiteste.apiteste.exception.NegocioException;
 import com.apiteste.apiteste.model.Cliente;
 import com.apiteste.apiteste.repository.ClienteRepository;
 import jakarta.transaction.Transactional;
@@ -26,11 +27,20 @@ public class ClienteService {
     }
 
     public Optional<Cliente> buscarClientePorNome(String nome) {
-        return clienteRepository.findByNomeContaining(nome);
+        var clienteExistente = clienteRepository.findByNomeContaining(nome);
+        if (!clienteExistente.isPresent()){
+            throw new NegocioException("Nao foi possivel localizar o cliente");
+        }
+        return clienteExistente;
+
     }
 
     public  Optional<Cliente> buscarClientePorId(UUID clienteId) {
-        return clienteRepository.findById(clienteId);
+        var clienteExistente = clienteRepository.findById(clienteId);
+        if (!clienteExistente.isPresent()){
+            throw new NegocioException("Nao foi possivel localizar o cliente");
+        }
+        return clienteExistente;
     }
 
     @Transactional
@@ -39,7 +49,9 @@ public class ClienteService {
         var clientExistenteBanco = clienteRepository.findByNomeContaining(cliente.getNome());
         var clienteCadastrado = new Cliente();
 
-        if(!clientExistenteBanco.isPresent()){
+        if (clientExistenteBanco.isPresent()){
+            throw new NegocioException("Cliente ja cadastrado");
+        }else {
             cliente.setDataCadastro(OffsetDateTime.now());
             cliente.setAtivo(Boolean.TRUE);
             clienteCadastrado = clienteRepository.save(cliente);

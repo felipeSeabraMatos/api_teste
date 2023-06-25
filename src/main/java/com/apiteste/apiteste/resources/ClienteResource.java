@@ -4,6 +4,7 @@ import com.apiteste.apiteste.model.Cliente;
 import com.apiteste.apiteste.services.ClienteService;
 import jakarta.validation.Valid;
 import jakarta.validation.executable.ValidateOnExecution;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,18 +16,17 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/clientes")
-@Validated
+@AllArgsConstructor
 public class ClienteResource {
 
-    @Autowired
-    private ClienteService clienteService;
+    private final ClienteService clienteService;
 
     @GetMapping
     private ResponseEntity<List<Cliente>> buscarClientes(){
         return ResponseEntity.ok().body(clienteService.buscarClientes());
     }
-    @GetMapping("/por-nome")
-    private ResponseEntity<Cliente> buscaPorNome(@RequestParam String nome){
+    @GetMapping("/por-nome/{nome}")
+    private ResponseEntity<Cliente> buscaPorNome(@PathVariable String nome){
         return clienteService.buscarClientePorNome(nome)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
