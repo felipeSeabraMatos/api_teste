@@ -1,6 +1,8 @@
 package com.apiteste.apiteste.resources;
 
+import com.apiteste.apiteste.exception.NegocioException;
 import com.apiteste.apiteste.model.Cliente;
+import com.apiteste.apiteste.repository.ClienteRepository;
 import com.apiteste.apiteste.services.ClienteService;
 import jakarta.validation.Valid;
 import jakarta.validation.executable.ValidateOnExecution;
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class ClienteResource {
 
     private final ClienteService clienteService;
+    private final ClienteRepository clienteRepository;
 
     @GetMapping
     private ResponseEntity<List<Cliente>> buscarClientes(){
@@ -58,8 +61,16 @@ public class ClienteResource {
 
     @DeleteMapping("/{clienteId}")
     public ResponseEntity<Void> excluir(@PathVariable UUID clienteId) {
-       clienteService.excluir(clienteId);
-       return ResponseEntity.noContent().build();
+        if (!clienteRepository.existsById(clienteId)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        clienteService.excluir(clienteId);
+        return ResponseEntity.noContent().build();
     }
 
+    @ExceptionHandler(NegocioException.class)
+    public ResponseEntity<String> capturar(NegocioException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 }
