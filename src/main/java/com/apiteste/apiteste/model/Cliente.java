@@ -1,6 +1,9 @@
 package com.apiteste.apiteste.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,9 +40,11 @@ public class Cliente {
     @Column(name = "ds_documento", length = 14 , nullable = false)
     private String documento;
 
+    @JsonProperty(access = Access.READ_ONLY)
     @Column(name = "dt_cadastro", nullable = false)
     private OffsetDateTime dataCadastro;
 
+    @JsonProperty(access = Access.READ_ONLY)
     @Column(name = "dt_alteracao")
     private OffsetDateTime dataAlteracao;
 
@@ -49,9 +54,11 @@ public class Cliente {
     @Column(name = "nu_telefone", length = 9)
     private Integer telefone;
 
+    @JsonProperty(access = Access.READ_ONLY)
     @Column(name = "bo_ativo", length = 1, nullable = false)
     private Boolean ativo;
 
+    @Email
     @Column(name = "ds_email", length = 100)
     private String email;
 

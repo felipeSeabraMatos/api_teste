@@ -2,9 +2,12 @@ package com.apiteste.apiteste.resources;
 
 import com.apiteste.apiteste.model.Cliente;
 import com.apiteste.apiteste.services.ClienteService;
+import jakarta.validation.Valid;
+import jakarta.validation.executable.ValidateOnExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +15,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/clientes")
+@Validated
 public class ClienteResource {
 
     @Autowired
@@ -37,7 +41,7 @@ public class ClienteResource {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    private ResponseEntity<Cliente> cadastrar(@RequestBody Cliente cliente){
+    private ResponseEntity<Cliente> cadastrar(@RequestBody  @Valid Cliente cliente){
         return ResponseEntity.ok().body(clienteService.cadastrarCliente(cliente));
     }
     @PutMapping("/{clienteId}")
