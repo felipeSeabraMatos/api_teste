@@ -1,5 +1,6 @@
 package com.apiteste.apiteste.resources;
 
+import com.apiteste.apiteste.dto.ClienteDTO;
 import com.apiteste.apiteste.model.Cliente;
 import com.apiteste.apiteste.repository.ClienteRepository;
 import com.apiteste.apiteste.services.ClienteService;
@@ -21,7 +22,7 @@ public class ClienteResource {
     private final ClienteRepository clienteRepository;
 
     @GetMapping
-    private ResponseEntity<List<Cliente>> buscarClientes(){
+    private ResponseEntity<List<ClienteDTO>> buscarClientes(){
         return ResponseEntity.ok().body(clienteService.buscarClientes());
     }
     @GetMapping("/por-nome/{nome}")

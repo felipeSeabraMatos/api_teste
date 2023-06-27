@@ -1,5 +1,6 @@
 package com.apiteste.apiteste.services;
 
+import com.apiteste.apiteste.dto.ClienteDTO;
 import com.apiteste.apiteste.exception.NegocioException;
 import com.apiteste.apiteste.model.Cliente;
 import com.apiteste.apiteste.repository.ClienteRepository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.nio.channels.FileChannel;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,8 +24,19 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
-    public List<Cliente> buscarClientes() {
-        return clienteRepository.findAll();
+    public List<ClienteDTO> buscarClientes() {
+        var clientes = clienteRepository.findAll();
+        List<ClienteDTO> clientesDTOList = new ArrayList<>();
+        clientes.stream().forEach(cliente -> {
+            var clienteDTO = new ClienteDTO();
+            clienteDTO.setId(cliente.getId());
+            clienteDTO.setNome(cliente.getNome());
+            clienteDTO.setSexo(cliente.getSexo());
+            clienteDTO.setCidade(cliente.getCidade());
+            clientesDTOList.add(clienteDTO);
+        });
+
+        return clientesDTOList;
     }
 
     public Optional<Cliente> buscarClientePorNome(String nome) {
