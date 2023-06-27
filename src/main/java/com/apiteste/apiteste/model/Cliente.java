@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,28 +17,39 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 @Entity
 @Table(name = "tb_cliente")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @EqualsAndHashCode.Include
     @Column(name = "id", nullable = false)
     private UUID id;
 
+    @NotEmpty
+    @NotNull
     @Column(name = "ds_nome", length = 150, nullable = false)
     private String nome;
 
+    @NotEmpty
+    @NotNull
     @Column(name = "ds_sexo", length = 100, nullable = false)
     private String sexo;
 
+    @NotEmpty
+    @NotNull
     @Column(name = "ds_cidade", length = 100, nullable = false)
     private String cidade;
 
+    @NotEmpty
+    @NotNull
     @Column(name = "ds_estado", length = 2, nullable = false)
     private String estado;
 
+    @NotEmpty
+    @NotNull
     @Column(name = "ds_documento", length = 14 , nullable = false)
     private String documento;
 
@@ -48,41 +61,56 @@ public class Cliente {
     @Column(name = "dt_alteracao")
     private OffsetDateTime dataAlteracao;
 
-    @Column(name = "nu_ddd", length = 3)
+    @NotEmpty
+    @NotNull
+    @Column(name = "nu_ddd", length = 3, nullable = false)
     private String codigoArea;
 
-    @Column(name = "nu_telefone", length = 9)
+    @NotNull
+    @Column(name = "nu_telefone", length = 9, nullable = false)
     private Integer telefone;
 
     @JsonProperty(access = Access.READ_ONLY)
     @Column(name = "bo_ativo", length = 1, nullable = false)
     private Boolean ativo;
 
+    @NotEmpty
+    @NotNull
     @Email
-    @Column(name = "ds_email", length = 100)
+    @Column(name = "ds_email", length = 100, nullable = false)
     private String email;
 
-    @Column(name = "ds_orgao_expedidor", length = 10)
+    @NotEmpty
+    @NotNull
+    @Column(name = "ds_orgao_expedidor", length = 10, nullable = false)
     private String orgaoExpedidor;
 
-    @Column(name = "ds_estado_civil", length = 10)
+    @NotNull
+    @Column(name = "ds_estado_civil", length = 10, nullable = false)
     @Enumerated(EnumType.STRING)
     private EstadoCivil estadoCivil;
 
-    @Column(name = "ds_tipo_cliente", length = 25)
+    @NotNull
+    @Column(name = "ds_tipo_cliente", length = 25, nullable = false)
     @Enumerated(EnumType.STRING)
     private TipoCliente tipoCliente;
 
-    @Column(name = "ds_nacionalidade", length = 20)
+    @NotEmpty
+    @NotNull
+    @Column(name = "ds_nacionalidade", length = 20, nullable = false)
     private String nacionalidade;
 
-    @Column(name = "ds_naturalidade", length = 20)
+    @NotEmpty
+    @NotNull
+    @Column(name = "ds_naturalidade", length = 20, nullable = false)
     private String naturalidade;
 
-    @Column(name = "dt_expedicao")
+    @NotNull
+    @Column(name = "dt_expedicao", nullable = false)
     private LocalDate dataExpedicao;
 
-    @Column(name = "ds_tipo_documento", length = 25)
+    @NotNull
+    @Column(name = "ds_tipo_documento", length = 25, nullable = false)
     @Enumerated(EnumType.STRING)
     private TipoDocumento tipoDocumento;
 
