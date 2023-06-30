@@ -23,20 +23,16 @@ public class ClienteResource {
 
     @GetMapping
     private ResponseEntity<List<ClienteDTO>> buscarClientes(){
-        return ResponseEntity.ok().body(clienteService.buscarClientes());
+        return ResponseEntity.ok().body(clienteService.listarClientes());
     }
     @GetMapping("/por-nome/{nome}")
-    private ResponseEntity<Cliente> buscaPorNome(@PathVariable String nome){
-        return clienteService.buscarClientePorNome(nome)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    private ResponseEntity<ClienteDTO> buscaPorNome(@PathVariable String nome){
+        return ResponseEntity.ok().body(clienteService.buscarClientePorNome(nome));
     }
 
     @GetMapping("/por-id/{clienteId}")
-    public ResponseEntity<Cliente> buscarPorId(@PathVariable UUID clienteId) {
-        return clienteService.buscarClientePorId(clienteId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ClienteDTO> buscarPorId(@PathVariable UUID clienteId) {
+        return ResponseEntity.ok().body(clienteService.buscarClientePorId(clienteId));
     }
 
     @PostMapping
