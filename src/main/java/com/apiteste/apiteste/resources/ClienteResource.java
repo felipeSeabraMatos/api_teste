@@ -38,7 +38,7 @@ public class ClienteResource {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    private ResponseEntity<Cliente> cadastrar(@RequestBody  @Valid Cliente cliente){
+    private ResponseEntity<ClienteDTO> cadastrar(@RequestBody  @Valid Cliente cliente){
         return ResponseEntity.ok().body(clienteService.cadastrarCliente(cliente));
     }
     @PutMapping("/{clienteId}")

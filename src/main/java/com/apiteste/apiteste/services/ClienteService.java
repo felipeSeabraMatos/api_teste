@@ -52,7 +52,7 @@ public class ClienteService {
     }
 
     @Transactional
-    public Cliente cadastrarCliente(Cliente cliente) {
+    public ClienteDTO cadastrarCliente(Cliente cliente) {
 
         var clientExistenteBanco = clienteRepository.findByNomeContaining(cliente.getNome());
         var clienteCadastrado = new Cliente();
@@ -65,7 +65,7 @@ public class ClienteService {
             clienteCadastrado = clienteRepository.save(cliente);
         }
 
-        return clienteCadastrado;
+        return clienteAssembler.toModel(clienteCadastrado);
 
     }
 
