@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -23,15 +24,15 @@ public class ClienteResource {
 
     @GetMapping
     private ResponseEntity<List<ClienteDTO>> buscarClientes(){
-        return ResponseEntity.ok().body(clienteService.listarClientes());
+        return ResponseEntity.ok().body(clienteService.buscarClientes());
     }
     @GetMapping("/por-nome/{nome}")
-    private ResponseEntity<ClienteDTO> buscaPorNome(@PathVariable String nome){
+    private ResponseEntity<Optional<ClienteDTO>> buscaPorNome(@PathVariable String nome){
         return ResponseEntity.ok().body(clienteService.buscarClientePorNome(nome));
     }
 
     @GetMapping("/por-id/{clienteId}")
-    public ResponseEntity<ClienteDTO> buscarPorId(@PathVariable UUID clienteId) {
+    public ResponseEntity<Optional<ClienteDTO>> buscarPorId(@PathVariable UUID clienteId) {
         return ResponseEntity.ok().body(clienteService.buscarClientePorId(clienteId));
     }
 

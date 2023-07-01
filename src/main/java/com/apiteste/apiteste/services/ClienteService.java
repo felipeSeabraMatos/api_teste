@@ -1,49 +1,54 @@
 package com.apiteste.apiteste.services;
 
+import com.apiteste.apiteste.assembler.ClienteAssembler;
 import com.apiteste.apiteste.dto.ClienteDTO;
 import com.apiteste.apiteste.exception.NegocioException;
+import com.apiteste.apiteste.mapper.ModelMapperConfig;
 import com.apiteste.apiteste.model.Cliente;
 import com.apiteste.apiteste.repository.ClienteRepository;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Service;
 
+import java.nio.channels.FileChannel;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2
+@AllArgsConstructor
 public class ClienteService {
 
-    @Autowired
-    private ClienteRepository clienteRepository;
-    private ModelMapper mapper;
+    private final ClienteRepository clienteRepository;
+    private final ClienteAssembler clienteAssembler;
 
-    @Autowired
-    public ClienteService(ClienteRepository clienteRepository, ModelMapper mapper) {
-        this.clienteRepository = clienteRepository;
-        this.mapper = mapper;
+    public List<ClienteDTO> buscarClientes() {
+        return clienteAssembler.toCollectionModel(clienteRepository.findAll());
     }
 
-    public List<ClienteDTO> listarClientes() {
-        return clienteRepository.findAll().stream()
-                .map(cliente -> mapper.map(cliente, ClienteDTO.class))
-                .collect(Collectors.toList());
-    }
-    public ClienteDTO buscarClientePorNome(String nome){
-        return clienteRepository.findByNomeContaining(nome)
-                .map(cliente -> mapper.map(cliente, ClienteDTO.class))
-                .orElseThrow(() -> new NegocioException("Cliente não encontrado"));
+    public Optional<ClienteDTO> buscarClientePorNome(String nome) {
+        var clienteExistente = clienteRepository.findByNomeContaining(nome);
+        if (!clienteExistente.isPresent()) {
+            throw new NegocioException("Nao foi possivel localizar o cliente");
+        }
+        return Optional.of(clienteAssembler.toModel(clienteExistente.get()));
+
     }
 
-    public ClienteDTO buscarClientePorId(UUID clienteId) {
-        return clienteRepository.findById(clienteId)
-                .map(cliente -> mapper.map(cliente, ClienteDTO.class))
-                .orElseThrow(() -> new NegocioException("Cliente não encontrado"));
+    public Optional<ClienteDTO> buscarClientePorId(UUID clienteId) {
+        var clienteExistente = clienteRepository.findById(clienteId);
+        if (!clienteExistente.isPresent()) {
+            throw new NegocioException("Nao foi possivel localizar o cliente");
+        }
+        return Optional.of(clienteAssembler.toModel(clienteExistente.get()));
     }
 
     @Transactional
