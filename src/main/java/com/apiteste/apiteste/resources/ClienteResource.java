@@ -38,8 +38,8 @@ public class ClienteResource {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    private ResponseEntity<ClienteDTO> cadastrar(@RequestBody  @Valid Cliente cliente){
-        return ResponseEntity.ok().body(clienteService.cadastrarCliente(cliente));
+    private ResponseEntity<ClienteDTO> cadastrar(@RequestBody  @Valid ClienteDTO clienteDTO){
+        return ResponseEntity.ok().body(clienteService.cadastrarCliente(clienteDTO));
     }
     @PutMapping("/{clienteId}")
     public ResponseEntity<Cliente> atualizar(@PathVariable UUID clienteId,

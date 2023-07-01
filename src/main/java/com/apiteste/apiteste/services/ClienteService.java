@@ -52,17 +52,17 @@ public class ClienteService {
     }
 
     @Transactional
-    public ClienteDTO cadastrarCliente(Cliente cliente) {
+    public ClienteDTO cadastrarCliente(ClienteDTO clienteDTO) {
 
-        var clientExistenteBanco = clienteRepository.findByNomeContaining(cliente.getNome());
+        var clientExistenteBanco = clienteRepository.findByNomeContaining(clienteDTO.getNome());
         var clienteCadastrado = new Cliente();
 
         if (clientExistenteBanco.isPresent()) {
             throw new NegocioException("Cliente ja cadastrado");
         } else {
-            cliente.setDataCadastro(OffsetDateTime.now());
-            cliente.setAtivo(Boolean.TRUE);
-            clienteCadastrado = clienteRepository.save(cliente);
+            clienteDTO.setDataCadastro(OffsetDateTime.now());
+            clienteDTO.setAtivo(Boolean.TRUE);
+            clienteCadastrado = clienteRepository.save(clienteAssembler.modelToDTO(clienteDTO));
         }
 
         return clienteAssembler.toModel(clienteCadastrado);
