@@ -40,16 +40,6 @@ public class Cliente {
 
     @NotEmpty
     @NotNull
-    @Column(name = "ds_cidade", length = 100, nullable = false)
-    private String cidade;
-
-    @NotEmpty
-    @NotNull
-    @Column(name = "ds_estado", length = 2, nullable = false)
-    private String estado;
-
-    @NotEmpty
-    @NotNull
     @Column(name = "ds_documento", length = 14 , nullable = false)
     private String documento;
 
@@ -60,6 +50,9 @@ public class Cliente {
     @JsonProperty(access = Access.READ_ONLY)
     @Column(name = "dt_alteracao")
     private OffsetDateTime dataAlteracao;
+
+    @Embedded
+    private Endereco endereco;
 
     @NotEmpty
     @NotNull
