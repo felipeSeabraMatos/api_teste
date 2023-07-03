@@ -2,6 +2,8 @@ package com.apiteste.apiteste.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -47,10 +49,10 @@ public class Endereco {
     @Column(name = "ds_cidade", length = 100, nullable = false)
     private String cidade;
 
-    @NotEmpty
     @NotNull
-    @Column(name = "ds_pais", length = 50, nullable = false)
-    private String pais;
+    @ManyToOne
+    @JoinColumn(name = "fk_pais", referencedColumnName = "id")
+    private Pais pais;
 
     @NotEmpty
     @NotNull

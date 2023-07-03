@@ -54,7 +54,7 @@ public class ClienteService {
     @Transactional
     public ClienteDTO cadastrarCliente(ClienteDTO clienteDTO) {
 
-        var clientExistenteBanco = clienteRepository.findByNomeContaining(clienteDTO.getNome());
+        var clientExistenteBanco = clienteRepository.findByDocumento(clienteDTO.getDocumento());
         var clienteCadastrado = new Cliente();
 
         if (clientExistenteBanco.isPresent()) {
