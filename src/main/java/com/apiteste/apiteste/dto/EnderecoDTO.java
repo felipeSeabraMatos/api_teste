@@ -43,9 +43,8 @@ public class EnderecoDTO {
     @NotNull
     private PaisDTO pais;
 
-    @NotEmpty
     @NotNull
-    private String estado;
+    private EstadoDTO estado;
 
 }
 

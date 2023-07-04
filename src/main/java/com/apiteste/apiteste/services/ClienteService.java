@@ -54,11 +54,12 @@ public class ClienteService {
     @Transactional
     public ClienteDTO cadastrarCliente(ClienteDTO clienteDTO) {
 
-        var clientExistenteBanco = clienteRepository.findByDocumento(clienteDTO.getDocumento());
+        var clienteExistenteBanco = clienteRepository.findByDocumentoOrEmail(clienteDTO.getDocumento(),
+                                                                                           clienteDTO.getEmail());
         var clienteCadastrado = new Cliente();
 
-        if (clientExistenteBanco.isPresent()) {
-            throw new NegocioException("Cliente ja cadastrado");
+        if (clienteExistenteBanco.isPresent()) {
+            throw new NegocioException("Documento ou email já cadastrados para o cliente");
         } else {
             clienteDTO.setDataCadastro(OffsetDateTime.now());
             clienteDTO.setAtivo(Boolean.TRUE);

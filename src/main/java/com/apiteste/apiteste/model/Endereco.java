@@ -54,9 +54,9 @@ public class Endereco {
     @JoinColumn(name = "fk_pais", referencedColumnName = "id")
     private Pais pais;
 
-    @NotEmpty
     @NotNull
-    @Column(name = "ds_estado", length = 2, nullable = false)
-    private String estado;
+    @ManyToOne
+    @JoinColumn (name = "fk_estado" , referencedColumnName = "id")
+    private Estado estado;
 
 }
