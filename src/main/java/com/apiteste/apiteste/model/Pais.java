@@ -19,7 +19,7 @@ public class Pais {
     @Id
     @EqualsAndHashCode.Include
     @Column(name = "id", nullable = false)
-    private Long id;
+    private Integer id;
 
     @NotEmpty
     @NotNull

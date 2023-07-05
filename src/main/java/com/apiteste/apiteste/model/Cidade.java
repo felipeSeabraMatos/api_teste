@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tb_estado")
+@Table(name = "tb_cidade")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Estado {
+public class Cidade {
 
     @Id
     @EqualsAndHashCode.Include
@@ -26,19 +26,13 @@ public class Estado {
     @Column(name = "ds_nome", length = 75, nullable = false)
     private String nome;
 
-    @NotEmpty
     @NotNull
-    @Column(name = "ds_uf", length = 2, nullable = false)
-    private String nomeEstado;
+    @ManyToOne
+    @JoinColumn(name = "fk_uf", referencedColumnName = "id")
+    private Estado estado;
 
     @NotNull
     @Column(name = "nr_ibge", length = 2 , nullable = false)
     private Integer ibge;
 
-    @Column(name = "ds_ddd", length = 50)
-    private String ddd;
-
-    @ManyToOne
-    @JoinColumn(name = "fk_pais", referencedColumnName = "id")
-    private Pais pais;
  }

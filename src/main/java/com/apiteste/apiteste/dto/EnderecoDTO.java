@@ -36,9 +36,8 @@ public class EnderecoDTO {
 
     private String cep;
 
-    @NotEmpty
     @NotNull
-    private String cidade;
+    private CidadeDTO cidade;
 
     @NotNull
     private PaisDTO pais;

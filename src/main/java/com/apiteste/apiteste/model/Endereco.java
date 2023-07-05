@@ -1,5 +1,6 @@
 package com.apiteste.apiteste.model;
 
+import com.apiteste.apiteste.dto.CidadeDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
@@ -44,10 +45,10 @@ public class Endereco {
     @Column(name = "ds_cep", length = 10)
     private String cep;
 
-    @NotEmpty
     @NotNull
-    @Column(name = "ds_cidade", length = 100, nullable = false)
-    private String cidade;
+    @ManyToOne
+    @JoinColumn(name = "fk_cidade", referencedColumnName = "id")
+    private Cidade cidade;
 
     @NotNull
     @ManyToOne
