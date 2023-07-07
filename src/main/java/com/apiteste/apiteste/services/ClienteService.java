@@ -1,12 +1,16 @@
 package com.apiteste.apiteste.services;
 
 import com.apiteste.apiteste.assembler.ClienteAssembler;
+import com.apiteste.apiteste.assembler.EnderecoAssembler;
 import com.apiteste.apiteste.dto.ClienteDTO;
+import com.apiteste.apiteste.dto.EnderecoDTO;
 import com.apiteste.apiteste.exception.NegocioException;
 import com.apiteste.apiteste.mapper.ModelMapperConfig;
 import com.apiteste.apiteste.model.Cliente;
 import com.apiteste.apiteste.repository.ClienteRepository;
+import com.apiteste.apiteste.repository.EnderecoRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -29,6 +33,8 @@ public class ClienteService {
 
     private final ClienteRepository clienteRepository;
     private final ClienteAssembler clienteAssembler;
+    private final EnderecoRepository enderecoRepository;
+    private final EnderecoAssembler enderecoAssembler;
 
     public List<ClienteDTO> buscarClientes() {
         return clienteAssembler.toCollectionModel(clienteRepository.findAll());
@@ -61,12 +67,15 @@ public class ClienteService {
         if (clienteExistenteBanco.isPresent()) {
             throw new NegocioException("Documento ou email já cadastrados para o cliente");
         } else {
+            var enderecoDTO = cadastrarEndereco(clienteDTO.getEndereco());
+
             clienteDTO.setDataCadastro(OffsetDateTime.now());
             clienteDTO.setAtivo(Boolean.TRUE);
+            clienteDTO.setEndereco(enderecoDTO);
             clienteCadastrado = clienteRepository.save(clienteAssembler.modelToDTO(clienteDTO));
         }
 
-        return clienteAssembler.toModel(clienteCadastrado);
+      return clienteAssembler.toModel(clienteCadastrado);
 
     }
 
@@ -109,5 +118,8 @@ public class ClienteService {
     private boolean buscarClienteExistentePorId(UUID clienteId) {
         return clienteRepository.existsById(clienteId);
     }
-
+    protected EnderecoDTO cadastrarEndereco(EnderecoDTO enderecoDTO) {
+        var enderecoCadastrado = enderecoRepository.save(enderecoAssembler.modelToDTO(enderecoDTO));
+        return enderecoAssembler.toModel(enderecoCadastrado);
+    }
 }

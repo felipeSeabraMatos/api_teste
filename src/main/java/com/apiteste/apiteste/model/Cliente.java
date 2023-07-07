@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.apache.catalina.User;
+
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -51,7 +53,8 @@ public class Cliente {
     @Column(name = "dt_alteracao")
     private OffsetDateTime dataAlteracao;
 
-    @Embedded
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "fk_endereco", referencedColumnName = "id")
     private Endereco endereco;
 
     @NotEmpty

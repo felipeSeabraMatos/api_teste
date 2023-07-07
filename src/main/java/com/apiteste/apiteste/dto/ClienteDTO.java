@@ -46,6 +46,7 @@ public class ClienteDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private OffsetDateTime dataAlteracao;
 
+    @NotNull
     private EnderecoDTO endereco;
 
     @NotEmpty
