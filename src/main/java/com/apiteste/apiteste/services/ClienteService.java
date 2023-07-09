@@ -1,13 +1,19 @@
 package com.apiteste.apiteste.services;
 
 import com.apiteste.apiteste.assembler.ClienteAssembler;
+import com.apiteste.apiteste.assembler.ContatoAssembler;
+import com.apiteste.apiteste.assembler.DocumentoAssembler;
 import com.apiteste.apiteste.assembler.EnderecoAssembler;
 import com.apiteste.apiteste.dto.ClienteDTO;
+import com.apiteste.apiteste.dto.ContatoDTO;
+import com.apiteste.apiteste.dto.DocumentoDTO;
 import com.apiteste.apiteste.dto.EnderecoDTO;
 import com.apiteste.apiteste.exception.NegocioException;
 import com.apiteste.apiteste.mapper.ModelMapperConfig;
 import com.apiteste.apiteste.model.Cliente;
 import com.apiteste.apiteste.repository.ClienteRepository;
+import com.apiteste.apiteste.repository.ContatoRepository;
+import com.apiteste.apiteste.repository.DocumentoRepository;
 import com.apiteste.apiteste.repository.EnderecoRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
@@ -36,6 +42,14 @@ public class ClienteService {
     private final EnderecoRepository enderecoRepository;
     private final EnderecoAssembler enderecoAssembler;
 
+    private final ContatoAssembler contatoAssembler;
+
+    private final ContatoRepository contatoRepository;
+
+    private final DocumentoAssembler documentoAssembler;
+
+    private final DocumentoRepository documentoRepository;
+
     public List<ClienteDTO> buscarClientes() {
         return clienteAssembler.toCollectionModel(clienteRepository.findAll());
     }
@@ -60,18 +74,22 @@ public class ClienteService {
     @Transactional
     public ClienteDTO cadastrarCliente(ClienteDTO clienteDTO) {
 
-        var clienteExistenteBanco = clienteRepository.findByDocumentoOrEmail(clienteDTO.getDocumento(),
-                                                                                           clienteDTO.getEmail());
+        var clienteExistenteBanco = clienteRepository.findByDocumentoDocumentoOrContatoEmail(clienteDTO.getDocumento().getDocumento(),
+                                                                                           clienteDTO.getContato().getEmail());
         var clienteCadastrado = new Cliente();
 
         if (clienteExistenteBanco.isPresent()) {
             throw new NegocioException("Documento ou email já cadastrados para o cliente");
         } else {
             var enderecoDTO = cadastrarEndereco(clienteDTO.getEndereco());
+            var documentoDTO = cadastrarDocumento(clienteDTO.getDocumento());
+            var contatoDTO = cadastrarContato(clienteDTO.getContato());
 
             clienteDTO.setDataCadastro(OffsetDateTime.now());
             clienteDTO.setAtivo(Boolean.TRUE);
             clienteDTO.setEndereco(enderecoDTO);
+            clienteDTO.setDocumento(documentoDTO);
+            clienteDTO.setContato(contatoDTO);
             clienteCadastrado = clienteRepository.save(clienteAssembler.modelToDTO(clienteDTO));
         }
 
@@ -121,5 +139,15 @@ public class ClienteService {
     protected EnderecoDTO cadastrarEndereco(EnderecoDTO enderecoDTO) {
         var enderecoCadastrado = enderecoRepository.save(enderecoAssembler.modelToDTO(enderecoDTO));
         return enderecoAssembler.toModel(enderecoCadastrado);
+    }
+
+    protected DocumentoDTO cadastrarDocumento(DocumentoDTO documentoDTO) {
+        var documentoCadastrado = documentoRepository.save(documentoAssembler.modelToDTO(documentoDTO));
+        return documentoAssembler.toModel(documentoCadastrado);
+    }
+
+    protected ContatoDTO cadastrarContato(ContatoDTO contatoDTO) {
+        var contatoCadastrado = contatoRepository.save(contatoAssembler.modelToDTO(contatoDTO));
+        return contatoAssembler.toModel(contatoCadastrado);
     }
 }
