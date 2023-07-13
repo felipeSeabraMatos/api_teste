@@ -18,14 +18,4 @@ public class PaisDTO {
     @NotEmpty
     @NotNull
     private String nome;
-
-    @NotEmpty
-    @NotNull
-    private String nomePais;
-
-    @NotEmpty
-    @NotNull
-    private String sigla;
-
-    private Integer bacem;
 }

@@ -21,8 +21,4 @@ public class CidadeDTO {
 
     @NotNull
     private EstadoDTO estado;
-
-    @NotNull
-    private Integer ibge;
-
 }

@@ -28,15 +28,8 @@ public class Estado {
 
     @NotEmpty
     @NotNull
-    @Column(name = "ds_uf", length = 2, nullable = false)
-    private String nomeEstado;
-
-    @NotNull
-    @Column(name = "nr_ibge", length = 2 , nullable = false)
-    private Integer ibge;
-
-    @Column(name = "ds_ddd", length = 50)
-    private String ddd;
+    @Column(name = "ds_sigla", length = 2, nullable = false)
+    private String sigla;
 
     @ManyToOne
     @JoinColumn(name = "fk_pais", referencedColumnName = "id")

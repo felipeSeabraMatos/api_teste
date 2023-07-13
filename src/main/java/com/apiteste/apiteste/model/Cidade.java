@@ -30,9 +30,4 @@ public class Cidade {
     @ManyToOne
     @JoinColumn(name = "fk_uf", referencedColumnName = "id")
     private Estado estado;
-
-    @NotNull
-    @Column(name = "nr_ibge", length = 2 , nullable = false)
-    private Integer ibge;
-
  }
