@@ -15,6 +15,7 @@ import com.apiteste.apiteste.repository.ClienteRepository;
 import com.apiteste.apiteste.repository.ContatoRepository;
 import com.apiteste.apiteste.repository.DocumentoRepository;
 import com.apiteste.apiteste.repository.EnderecoRepository;
+import com.apiteste.apiteste.services.comum.CepService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -50,6 +51,8 @@ public class ClienteService {
 
     private final DocumentoRepository documentoRepository;
 
+    private final CepService cepService;
+
     public List<ClienteDTO> buscarClientes() {
         return clienteAssembler.toCollectionModel(clienteRepository.findAll());
     }
@@ -82,6 +85,7 @@ public class ClienteService {
             throw new NegocioException("Documento ou email já cadastrados para o cliente");
         } else {
             var enderecoDTO = cadastrarEndereco(clienteDTO.getEndereco());
+            var cepDTO = cepService.buscaEnderecoPorCep(enderecoDTO.getCep());
             var documentoDTO = cadastrarDocumento(clienteDTO.getDocumento());
             var contatoDTO = cadastrarContato(clienteDTO.getContato());
 
@@ -94,7 +98,6 @@ public class ClienteService {
         }
 
       return clienteAssembler.toModel(clienteCadastrado);
-
     }
 
     @Transactional

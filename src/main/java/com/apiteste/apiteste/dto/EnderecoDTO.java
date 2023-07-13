@@ -1,6 +1,7 @@
 package com.apiteste.apiteste.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,16 +15,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class EnderecoDTO {
 
-    @NotEmpty
-    @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String logradouro;
 
     @NotEmpty
     @NotNull
     private String tipoLogradouro;
 
-    @NotEmpty
-    @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String bairro;
 
     @NotEmpty
@@ -31,17 +30,18 @@ public class EnderecoDTO {
     private String numero;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String complemento;
 
     private String cep;
 
-    @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private CidadeDTO cidade;
 
     @NotNull
     private PaisDTO pais;
 
-    @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private EstadoDTO estado;
 
 }
