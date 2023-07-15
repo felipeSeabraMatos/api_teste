@@ -8,6 +8,7 @@ import com.apiteste.apiteste.dto.ClienteDTO;
 import com.apiteste.apiteste.dto.ContatoDTO;
 import com.apiteste.apiteste.dto.DocumentoDTO;
 import com.apiteste.apiteste.dto.EnderecoDTO;
+import com.apiteste.apiteste.dto.comum.CepDTO;
 import com.apiteste.apiteste.exception.NegocioException;
 import com.apiteste.apiteste.mapper.ModelMapperConfig;
 import com.apiteste.apiteste.model.Cliente;
@@ -28,10 +29,7 @@ import org.springframework.stereotype.Service;
 import java.nio.channels.FileChannel;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Log4j2
@@ -80,21 +78,29 @@ public class ClienteService {
         var clienteExistenteBanco = clienteRepository.findByDocumentoDocumentoOrContatoEmail(clienteDTO.getDocumento().getDocumento(),
                                                                                            clienteDTO.getContato().getEmail());
         var clienteCadastrado = new Cliente();
+        var cepDTO = new CepDTO();
 
         if (clienteExistenteBanco.isPresent()) {
             throw new NegocioException("Documento ou email já cadastrados para o cliente");
         } else {
-            var enderecoDTO = cadastrarEndereco(clienteDTO.getEndereco());
-            var cepDTO = cepService.buscaEnderecoPorCep(enderecoDTO.getCep());
-            var documentoDTO = cadastrarDocumento(clienteDTO.getDocumento());
-            var contatoDTO = cadastrarContato(clienteDTO.getContato());
+            if(clienteDTO.getEndereco().getCep().isEmpty()){
+                throw new NegocioException("CEP não informado");
+            } else if (clienteDTO.getEndereco().getCep().length() < 8 ||
+                    clienteDTO.getEndereco().getCep().length() > 8) {
+                throw new NegocioException("CEP informado não segue o padrão");
+            } else {
+                var enderecoDTO = cadastrarEndereco(clienteDTO.getEndereco());
+                cepDTO = cepService.buscaEnderecoPorCep(enderecoDTO.getCep());
+                var documentoDTO = cadastrarDocumento(clienteDTO.getDocumento());
+                var contatoDTO = cadastrarContato(clienteDTO.getContato());
 
-            clienteDTO.setDataCadastro(OffsetDateTime.now());
-            clienteDTO.setAtivo(Boolean.TRUE);
-            clienteDTO.setEndereco(enderecoDTO);
-            clienteDTO.setDocumento(documentoDTO);
-            clienteDTO.setContato(contatoDTO);
-            clienteCadastrado = clienteRepository.save(clienteAssembler.modelToDTO(clienteDTO));
+                clienteDTO.setDataCadastro(OffsetDateTime.now());
+                clienteDTO.setAtivo(Boolean.TRUE);
+                clienteDTO.setEndereco(enderecoDTO);
+                clienteDTO.setDocumento(documentoDTO);
+                clienteDTO.setContato(contatoDTO);
+                clienteCadastrado = clienteRepository.save(clienteAssembler.modelToDTO(clienteDTO));
+            }
         }
 
       return clienteAssembler.toModel(clienteCadastrado);

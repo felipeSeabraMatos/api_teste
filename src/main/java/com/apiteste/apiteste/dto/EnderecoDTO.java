@@ -33,6 +33,8 @@ public class EnderecoDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String complemento;
 
+    @NotNull
+    @NotEmpty
     private String cep;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
