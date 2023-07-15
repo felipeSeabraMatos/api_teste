@@ -41,10 +41,10 @@ public class Endereco {
     @Column(name = "ds_numero", length = 10, nullable = false)
     private String numero;
 
-    @Column(name = "ds_complemento", length = 255)
+    @Column(name = "ds_complemento")
     private String complemento;
 
-    @Column(name = "ds_cep", length = 10)
+    @Column(name = "ds_cep", length = 8)
     private String cep;
 
     @NotNull

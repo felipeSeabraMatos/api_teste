@@ -5720,7 +5720,7 @@ CREATE TABLE `tb_endereco` (
   `fk_cidade` int(11) NOT NULL,
   `fk_estado` int(11) NOT NULL,
   `fk_pais` int(11) NOT NULL,
-  `ds_cep` varchar(10) DEFAULT NULL,
+  `ds_cep` varchar(8) DEFAULT NULL,
   `ds_numero` varchar(10) NOT NULL,
   `id` binary(16) NOT NULL,
   `ds_tp_logradouro` varchar(100) NOT NULL,

@@ -38,13 +38,13 @@ public class ClienteResource {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    private ResponseEntity<ClienteDTO> cadastrar(@RequestBody  @Valid ClienteDTO clienteDTO){
+    private ResponseEntity<ClienteDTO> cadastrar(@RequestBody @Valid ClienteDTO clienteDTO){
         return ResponseEntity.ok().body(clienteService.cadastrarCliente(clienteDTO));
     }
     @PutMapping("/{clienteId}")
-    public ResponseEntity<Cliente> atualizar(@PathVariable UUID clienteId,
-                                                  @RequestBody Cliente cliente) {
-        return ResponseEntity.ok(clienteService.atualizarCliente(clienteId, cliente));
+    public ResponseEntity<ClienteDTO> atualizar(@PathVariable UUID clienteId,
+                                                @RequestBody ClienteDTO clienteDTO) {
+        return ResponseEntity.ok(clienteService.atualizarCliente(clienteId, clienteDTO));
     }
 
     @PatchMapping("/alterar-status/{clienteId}/{status}")

@@ -101,16 +101,22 @@ public class ClienteService {
     }
 
     @Transactional
-    public Cliente atualizarCliente(UUID clienteId, Cliente cliente) {
-        var clienteAtualizado = new Cliente();
+    public ClienteDTO atualizarCliente(UUID clienteId, ClienteDTO clienteDTO) {
         var clienteExistenteBanco = clienteRepository.findById(clienteId);
+        var clienteAtualizado = new ClienteDTO();
 
-        if (clienteRepository.existsById(clienteId)) {
-            cliente.setId(clienteId);
-            cliente.setDataCadastro(clienteExistenteBanco.get().getDataCadastro());
-            cliente.setAtivo(clienteExistenteBanco.get().getAtivo());
-            cliente.setDataAlteracao(OffsetDateTime.now());
-            clienteAtualizado = clienteRepository.save(cliente);
+        if (!clienteExistenteBanco.isPresent()) {
+            throw new NegocioException("Cliente não cadastrado!");
+        }
+
+        if (clienteRepository.existsById(clienteId) && clienteExistenteBanco.isPresent()) {
+            clienteDTO.setId(clienteExistenteBanco.get().getId());
+            clienteDTO.setDataAlteracao(OffsetDateTime.now());
+            clienteDTO.setDataCadastro(clienteExistenteBanco.get().getDataCadastro());
+            clienteDTO.setAtivo(clienteExistenteBanco.get().getAtivo());
+            clienteDTO.setDocumento(documentoAssembler.toModel(clienteExistenteBanco.get().getDocumento()));
+
+            clienteAtualizado = clienteAssembler.toModel(clienteRepository.saveAndFlush(clienteAssembler.modelToDTO(clienteDTO)));
         }
 
         return clienteAtualizado;
