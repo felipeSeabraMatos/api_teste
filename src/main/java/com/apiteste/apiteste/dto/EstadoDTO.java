@@ -22,11 +22,5 @@ public class EstadoDTO {
     @NotEmpty
     @NotNull
     private String nomeEstado;
-
-    @NotNull
-    private Integer ibge;
-
-    private String ddd;
-
     private PaisDTO pais;
 }

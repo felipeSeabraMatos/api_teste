@@ -1,9 +1,6 @@
 package com.apiteste.apiteste.services;
 
-import com.apiteste.apiteste.assembler.ClienteAssembler;
-import com.apiteste.apiteste.assembler.ContatoAssembler;
-import com.apiteste.apiteste.assembler.DocumentoAssembler;
-import com.apiteste.apiteste.assembler.EnderecoAssembler;
+import com.apiteste.apiteste.assembler.*;
 import com.apiteste.apiteste.dto.ClienteDTO;
 import com.apiteste.apiteste.dto.ContatoDTO;
 import com.apiteste.apiteste.dto.DocumentoDTO;
@@ -12,16 +9,14 @@ import com.apiteste.apiteste.dto.comum.CepDTO;
 import com.apiteste.apiteste.exception.NegocioException;
 import com.apiteste.apiteste.mapper.ModelMapperConfig;
 import com.apiteste.apiteste.model.Cliente;
-import com.apiteste.apiteste.repository.ClienteRepository;
-import com.apiteste.apiteste.repository.ContatoRepository;
-import com.apiteste.apiteste.repository.DocumentoRepository;
-import com.apiteste.apiteste.repository.EnderecoRepository;
+import com.apiteste.apiteste.repository.*;
 import com.apiteste.apiteste.services.comum.CepService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Service;
@@ -35,6 +30,8 @@ import java.util.*;
 @Log4j2
 @AllArgsConstructor
 public class ClienteService {
+
+    public static final int TAMANHO_CEP = 8;
 
     private final ClienteRepository clienteRepository;
     private final ClienteAssembler clienteAssembler;
@@ -50,6 +47,10 @@ public class ClienteService {
     private final DocumentoRepository documentoRepository;
 
     private final CepService cepService;
+    private final EstadoRepository estadoRepository;
+    private final CidadeRepository cidadeRepository;
+    private final EstadoAssembler estadoAssembler;
+    private final CidadeAssembler cidadeAssembler;
 
     public List<ClienteDTO> buscarClientes() {
         return clienteAssembler.toCollectionModel(clienteRepository.findAll());
@@ -79,18 +80,25 @@ public class ClienteService {
                                                                                            clienteDTO.getContato().getEmail());
         var clienteCadastrado = new Cliente();
         var cepDTO = new CepDTO();
+        var cepFormatado = formatarCep(clienteDTO.getEndereco().getCep());
 
         if (clienteExistenteBanco.isPresent()) {
             throw new NegocioException("Documento ou email já cadastrados para o cliente");
         } else {
             if(clienteDTO.getEndereco().getCep().isEmpty()){
                 throw new NegocioException("CEP não informado");
-            } else if (clienteDTO.getEndereco().getCep().length() < 8 ||
-                    clienteDTO.getEndereco().getCep().length() > 8) {
+            } else if (
+                    validarTamanhoCep(cepFormatado)) {
                 throw new NegocioException("CEP informado não segue o padrão");
             } else {
+                cepDTO = cepService.buscaEnderecoPorCep(cepFormatado);
+                var estadoDTO = estadoAssembler.toModel(estadoRepository.findBySigla(cepDTO.getUf()) );
+                var cidadeDTO = cidadeAssembler.toModel (cidadeRepository.findByNome(cepDTO.getLocalidade()));
+                BeanUtils.copyProperties(cepDTO, clienteDTO.getEndereco());
+                clienteDTO.getEndereco().setEstado(estadoDTO);
+                clienteDTO.getEndereco().setCidade(cidadeDTO);
+                clienteDTO.getEndereco().setCep(cepFormatado);
                 var enderecoDTO = cadastrarEndereco(clienteDTO.getEndereco());
-                cepDTO = cepService.buscaEnderecoPorCep(enderecoDTO.getCep());
                 var documentoDTO = cadastrarDocumento(clienteDTO.getDocumento());
                 var contatoDTO = cadastrarContato(clienteDTO.getContato());
 
@@ -164,5 +172,15 @@ public class ClienteService {
     protected ContatoDTO cadastrarContato(ContatoDTO contatoDTO) {
         var contatoCadastrado = contatoRepository.save(contatoAssembler.modelToDTO(contatoDTO));
         return contatoAssembler.toModel(contatoCadastrado);
+    }
+
+    protected boolean validarTamanhoCep(String cep) {
+        return cep.length() < TAMANHO_CEP || cep.length() > TAMANHO_CEP;
+    }
+
+    public String formatarCep(String cep){
+        cep = cep.replaceAll("\\.","");
+        cep = cep.replaceAll("-", "");
+        return cep;
     }
 }

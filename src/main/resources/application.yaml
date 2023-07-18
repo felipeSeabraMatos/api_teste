@@ -5,7 +5,7 @@ spring:
   application:
     name: api-teste
   datasource:
-    url:  jdbc:mysql://localhost:3306/APITESTE
+    url:  jdbc:mysql://localhost:8111/apiteste2
     username: root
     password:
   jpa:
