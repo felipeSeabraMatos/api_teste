@@ -7,7 +7,6 @@ import com.apiteste.apiteste.dto.DocumentoDTO;
 import com.apiteste.apiteste.dto.EnderecoDTO;
 import com.apiteste.apiteste.dto.comum.CepDTO;
 import com.apiteste.apiteste.exception.NegocioException;
-import com.apiteste.apiteste.mapper.ModelMapperConfig;
 import com.apiteste.apiteste.model.Cliente;
 import com.apiteste.apiteste.repository.*;
 import com.apiteste.apiteste.services.comum.CepService;
@@ -15,14 +14,9 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Service;
 
-import java.nio.channels.FileChannel;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -77,41 +71,57 @@ public class ClienteService {
     public ClienteDTO cadastrarCliente(ClienteDTO clienteDTO) {
 
         var clienteExistenteBanco = clienteRepository.findByDocumentoDocumentoOrContatoEmail(clienteDTO.getDocumento().getDocumento(),
-                                                                                           clienteDTO.getContato().getEmail());
+                clienteDTO.getContato().getEmail());
         var clienteCadastrado = new Cliente();
-        var cepDTO = new CepDTO();
         var cepFormatado = formatarCep(clienteDTO.getEndereco().getCep());
-
         if (clienteExistenteBanco.isPresent()) {
             throw new NegocioException("Documento ou email já cadastrados para o cliente");
         } else {
-            if(clienteDTO.getEndereco().getCep().isEmpty()){
-                throw new NegocioException("CEP não informado");
-            } else if (
-                    validarTamanhoCep(cepFormatado)) {
-                throw new NegocioException("CEP informado não segue o padrão");
-            } else {
-                cepDTO = cepService.buscaEnderecoPorCep(cepFormatado);
-                var estadoDTO = estadoAssembler.toModel(estadoRepository.findBySigla(cepDTO.getUf()) );
-                var cidadeDTO = cidadeAssembler.toModel (cidadeRepository.findByNome(cepDTO.getLocalidade()));
-                BeanUtils.copyProperties(cepDTO, clienteDTO.getEndereco());
-                clienteDTO.getEndereco().setEstado(estadoDTO);
-                clienteDTO.getEndereco().setCidade(cidadeDTO);
-                clienteDTO.getEndereco().setCep(cepFormatado);
-                var enderecoDTO = cadastrarEndereco(clienteDTO.getEndereco());
-                var documentoDTO = cadastrarDocumento(clienteDTO.getDocumento());
-                var contatoDTO = cadastrarContato(clienteDTO.getContato());
+            validarCep(clienteDTO, cepFormatado);
+            var builderClienteDTO = builderCliente(clienteDTO);
+            var builderEnderecoDTO = builderEndereco(builderClienteDTO, cepFormatado);
+            var enderecoDTO = cadastrarEndereco(builderEnderecoDTO);
+            builderClienteDTO.setEndereco(enderecoDTO);
+            clienteCadastrado = clienteRepository.save(clienteAssembler.modelToDTO(builderClienteDTO));
+        }
+        return clienteAssembler.toModel(clienteCadastrado);
+    }
 
-                clienteDTO.setDataCadastro(OffsetDateTime.now());
-                clienteDTO.setAtivo(Boolean.TRUE);
-                clienteDTO.setEndereco(enderecoDTO);
-                clienteDTO.setDocumento(documentoDTO);
-                clienteDTO.setContato(contatoDTO);
-                clienteCadastrado = clienteRepository.save(clienteAssembler.modelToDTO(clienteDTO));
-            }
+    private ClienteDTO builderCliente(ClienteDTO clienteDTO) {
+        var documentoDTO = cadastrarDocumento(clienteDTO.getDocumento());
+        var contatoDTO = cadastrarContato(clienteDTO.getContato());
+
+        clienteDTO.setDataCadastro(OffsetDateTime.now());
+        clienteDTO.setAtivo(Boolean.TRUE);
+        clienteDTO.setDocumento(documentoDTO);
+        clienteDTO.setContato(contatoDTO);
+        return clienteDTO;
+    }
+
+    private void validarCep(ClienteDTO clienteDTO, String cepFormatado) {
+        if(clienteDTO.getEndereco().getCep().isEmpty()){
+            throw new NegocioException("CEP não informado");
+        } else if (validarTamanhoCep(cepFormatado)) {
+            throw new NegocioException("CEP informado não segue o padrão");
+        }
+    }
+    private EnderecoDTO builderEndereco(ClienteDTO clienteDTO, String cepFormatado) {
+        var cepDTO = cepService.buscaEnderecoPorCep(cepFormatado);
+        if (cepDTO.isErro() == Boolean.FALSE && cepDTO.getSucesso() == Boolean.FALSE){
+            throw new NegocioException("Cep não encontrado!");
+        } else {
+            var estadoDTO = estadoAssembler.toModel(estadoRepository.findBySigla(cepDTO.getUf()) );
+            var cidadeDTO = cidadeAssembler.toModel (cidadeRepository.findByNome(cepDTO.getLocalidade()));
+            clienteDTO.getEndereco().setEstado(estadoDTO);
+            clienteDTO.getEndereco().setCidade(cidadeDTO);
+            clienteDTO.getEndereco().setCep(cepFormatado);
+            clienteDTO.getEndereco().setComplemento(cepDTO.getComplemento());
+            clienteDTO.getEndereco().setLogradouro(cepDTO.getLogradouro());
+            clienteDTO.getEndereco().setBairro(cepDTO.getBairro());
+            return clienteDTO.getEndereco();
+
         }
 
-      return clienteAssembler.toModel(clienteCadastrado);
     }
 
     @Transactional
