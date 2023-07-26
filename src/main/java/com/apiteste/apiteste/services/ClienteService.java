@@ -5,42 +5,34 @@ import com.apiteste.apiteste.dto.ClienteDTO;
 import com.apiteste.apiteste.dto.ContatoDTO;
 import com.apiteste.apiteste.dto.DocumentoDTO;
 import com.apiteste.apiteste.dto.EnderecoDTO;
-import com.apiteste.apiteste.dto.comum.CepDTO;
 import com.apiteste.apiteste.exception.NegocioException;
 import com.apiteste.apiteste.model.Cliente;
 import com.apiteste.apiteste.repository.*;
 import com.apiteste.apiteste.services.comum.CepService;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Log4j2
 @AllArgsConstructor
 public class ClienteService {
 
-    public static final int TAMANHO_CEP = 8;
-
     private final ClienteRepository clienteRepository;
     private final ClienteAssembler clienteAssembler;
     private final EnderecoRepository enderecoRepository;
     private final EnderecoAssembler enderecoAssembler;
-
     private final ContatoAssembler contatoAssembler;
-
     private final ContatoRepository contatoRepository;
-
     private final DocumentoAssembler documentoAssembler;
-
-    private final DocumentoRepository documentoRepository;
-
     private final CepService cepService;
+    private final DocumentoService documentoService;
     private final EstadoRepository estadoRepository;
     private final CidadeRepository cidadeRepository;
     private final EstadoAssembler estadoAssembler;
@@ -52,9 +44,11 @@ public class ClienteService {
 
     public Optional<ClienteDTO> buscarClientePorNome(String nome) {
         var clienteExistente = clienteRepository.findByNomeContaining(nome);
+
         if (!clienteExistente.isPresent()) {
             throw new NegocioException("Nao foi possivel localizar o cliente");
         }
+
         return Optional.of(clienteAssembler.toModel(clienteExistente.get()));
 
     }
@@ -73,22 +67,25 @@ public class ClienteService {
         var clienteExistenteBanco = clienteRepository.findByDocumentoDocumentoOrContatoEmail(clienteDTO.getDocumento().getDocumento(),
                 clienteDTO.getContato().getEmail());
         var clienteCadastrado = new Cliente();
-        var cepFormatado = formatarCep(clienteDTO.getEndereco().getCep());
+        var cepFormatado = cepService.formatarCep(clienteDTO.getEndereco().getCep());
+
         if (clienteExistenteBanco.isPresent()) {
             throw new NegocioException("Documento ou email já cadastrados para o cliente");
         } else {
-            validarCep(clienteDTO, cepFormatado);
+            cepService.validarCep(clienteDTO, cepFormatado);
             var builderClienteDTO = builderCliente(clienteDTO);
             var builderEnderecoDTO = builderEndereco(builderClienteDTO, cepFormatado);
             var enderecoDTO = cadastrarEndereco(builderEnderecoDTO);
             builderClienteDTO.setEndereco(enderecoDTO);
             clienteCadastrado = clienteRepository.save(clienteAssembler.modelToDTO(builderClienteDTO));
         }
+
         return clienteAssembler.toModel(clienteCadastrado);
     }
 
     private ClienteDTO builderCliente(ClienteDTO clienteDTO) {
-        var documentoDTO = cadastrarDocumento(clienteDTO.getDocumento());
+        var documentoDTO = documentoService.validarDocumentoTipoPessoa(clienteDTO);
+
         var contatoDTO = cadastrarContato(clienteDTO.getContato());
 
         clienteDTO.setDataCadastro(OffsetDateTime.now());
@@ -98,13 +95,6 @@ public class ClienteService {
         return clienteDTO;
     }
 
-    private void validarCep(ClienteDTO clienteDTO, String cepFormatado) {
-        if(clienteDTO.getEndereco().getCep().isEmpty()){
-            throw new NegocioException("CEP não informado");
-        } else if (validarTamanhoCep(cepFormatado)) {
-            throw new NegocioException("CEP informado não segue o padrão");
-        }
-    }
     private EnderecoDTO builderEndereco(ClienteDTO clienteDTO, String cepFormatado) {
         var cepDTO = cepService.buscaEnderecoPorCep(cepFormatado);
         if (cepDTO.isErro() == Boolean.FALSE && cepDTO.getSucesso() == Boolean.FALSE){
@@ -118,6 +108,9 @@ public class ClienteService {
             clienteDTO.getEndereco().setComplemento(cepDTO.getComplemento());
             clienteDTO.getEndereco().setLogradouro(cepDTO.getLogradouro());
             clienteDTO.getEndereco().setBairro(cepDTO.getBairro());
+            var documentoDTO = documentoService.validarDocumentoPessoaFisica(clienteDTO);
+            clienteDTO.setDocumento(documentoDTO);
+
             return clienteDTO.getEndereco();
 
         }
@@ -174,23 +167,9 @@ public class ClienteService {
         return enderecoAssembler.toModel(enderecoCadastrado);
     }
 
-    protected DocumentoDTO cadastrarDocumento(DocumentoDTO documentoDTO) {
-        var documentoCadastrado = documentoRepository.save(documentoAssembler.modelToDTO(documentoDTO));
-        return documentoAssembler.toModel(documentoCadastrado);
-    }
-
     protected ContatoDTO cadastrarContato(ContatoDTO contatoDTO) {
         var contatoCadastrado = contatoRepository.save(contatoAssembler.modelToDTO(contatoDTO));
         return contatoAssembler.toModel(contatoCadastrado);
     }
 
-    protected boolean validarTamanhoCep(String cep) {
-        return cep.length() < TAMANHO_CEP || cep.length() > TAMANHO_CEP;
-    }
-
-    public String formatarCep(String cep){
-        cep = cep.replaceAll("\\.","");
-        cep = cep.replaceAll("-", "");
-        return cep;
-    }
 }

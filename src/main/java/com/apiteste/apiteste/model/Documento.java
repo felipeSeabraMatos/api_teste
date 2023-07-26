@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.br.CNPJ;
+import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -25,9 +27,7 @@ public class Documento {
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @NotEmpty
-    @NotNull
-    @Column(name = "ds_documento", length = 14 , nullable = false)
+    @Column(name = "ds_documento", length = 30 , nullable = false)
     private String documento;
 
     @NotEmpty
@@ -39,9 +39,16 @@ public class Documento {
     @Column(name = "dt_emissao", nullable = false)
     private LocalDate dataEmissao;
 
-    @NotNull
-    @Column(name = "ds_tipo_documento", length = 25, nullable = false)
+    @Column(name = "ds_tipo_documento", length = 30)
     @Enumerated(EnumType.STRING)
     private TipoDocumento tipoDocumento;
+
+    @CPF
+    @Column(name = "ds_cpf", length = 11)
+    private String cpf;
+
+    @CNPJ
+    @Column(name = "ds_cnpj", length = 14)
+    private String cnpj;
 
 }

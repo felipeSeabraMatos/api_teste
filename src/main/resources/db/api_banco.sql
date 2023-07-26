@@ -5653,8 +5653,7 @@ CREATE TABLE `tb_cliente` (
   `id` binary(16) NOT NULL,
   `ds_nacionalidade` varchar(20) NOT NULL,
   `ds_naturalidade` varchar(20) NOT NULL,
-  `ds_tipo_cliente` enum('PESSOA_FISICA','PESSOA_JURUDICA') NOT NULL,
-  `ds_tipo_documento` enum('CARTEIRA_MOTORISTA','CARTEIRA_TRABALHO','CPF','PASSAPORTE','RG') NOT NULL,
+  `ds_tipo_cliente` varchar(100) NOT NULL,
   `ds_sexo` varchar(100) NOT NULL,
   `ds_nome` varchar(150) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -5662,10 +5661,6 @@ CREATE TABLE `tb_cliente` (
 --
 -- Extraindo dados da tabela `tb_cliente`
 --
-
-INSERT INTO `tb_cliente` (`bo_ativo`, `dt_alteracao`, `dt_cadastro`, `ds_estado_civil`, `fk_contato`, `fk_documento`, `fk_endereco`, `id`, `ds_nacionalidade`, `ds_naturalidade`, `ds_tipo_cliente`, `ds_tipo_documento`, `ds_sexo`, `ds_nome`) VALUES
-(b'1', NULL, '2023-07-09 20:58:05.000000', 'SOLTEIRO', 0x5ee6d9142f3a46a1a825fb6be984a7f6, 0x47f70ebf6fa845f498ce4181e67c7703, 0x7fa8f0f2a0604aa98eb771a0db5d108c, 0x509e2f7b275248eea55931366f8cc00f, 'Brasileira', 'Paulista', 'PESSOA_FISICA', 'RG', 'feminino', 'Pepita');
-
 -- --------------------------------------------------------
 
 --
@@ -5697,19 +5692,16 @@ INSERT INTO `tb_contato` (`nu_ddd`, `nu_telefone`, `id`, `ds_email`, `ds_tipo_co
 CREATE TABLE `tb_documento` (
   `dt_emissao` date NOT NULL,
   `ds_orgao_expedidor` varchar(10) NOT NULL,
-  `ds_documento` varchar(14) NOT NULL,
+  `ds_cpf` varchar(11) NULL,
+  `ds_cnpj` varchar(14) NULL,
+  `ds_documento` varchar(20) NULL,
   `id` binary(16) NOT NULL,
-  `ds_tipo_documento` enum('CARTEIRA_MOTORISTA','CARTEIRA_TRABALHO','CPF','PASSAPORTE','RG') NOT NULL
+  `ds_tipo_documento` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Extraindo dados da tabela `tb_documento`
 --
-
-INSERT INTO `tb_documento` (`dt_emissao`, `ds_orgao_expedidor`, `ds_documento`, `id`, `ds_tipo_documento`) VALUES
-('2023-01-30', 'SSP/DF', '1234567890', 0x47f70ebf6fa845f498ce4181e67c7703, 'RG'),
-('2023-01-30', 'SSP/DF', '1234567890', 0xde6d3532fecb4a839cab9d8179155ea0, 'RG');
-
 -- --------------------------------------------------------
 
 --

@@ -22,5 +22,8 @@ public class EstadoDTO {
     @NotEmpty
     @NotNull
     private String nomeEstado;
+
+    private String sigla;
+
     private PaisDTO pais;
 }

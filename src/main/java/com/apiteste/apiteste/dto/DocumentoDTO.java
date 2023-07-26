@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.br.CNPJ;
+import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.LocalDate;
 
@@ -18,8 +20,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class DocumentoDTO {
 
-    @NotEmpty
-    @NotNull
     private String documento;
 
     @NotEmpty
@@ -29,8 +29,13 @@ public class DocumentoDTO {
     @NotNull
     private LocalDate dataEmissao;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
     private TipoDocumento tipoDocumento;
+
+    @CPF
+    private String cpf;
+
+    @CNPJ
+    private String cnpj;
+
 
 }

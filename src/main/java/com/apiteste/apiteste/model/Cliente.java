@@ -81,10 +81,4 @@ public class Cliente {
     @Column(name = "ds_naturalidade", length = 20, nullable = false)
     private String naturalidade;
 
-    @NotNull
-    @Column(name = "ds_tipo_documento", length = 25, nullable = false)
-    @Enumerated(EnumType.STRING)
-    private TipoDocumento tipoDocumento;
-
-
 }
