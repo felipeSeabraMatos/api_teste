@@ -3,7 +3,6 @@ package com.apiteste.apiteste.services;
 import com.apiteste.apiteste.assembler.*;
 import com.apiteste.apiteste.dto.ClienteDTO;
 import com.apiteste.apiteste.dto.ContatoDTO;
-import com.apiteste.apiteste.dto.DocumentoDTO;
 import com.apiteste.apiteste.dto.EnderecoDTO;
 import com.apiteste.apiteste.exception.NegocioException;
 import com.apiteste.apiteste.model.Cliente;
