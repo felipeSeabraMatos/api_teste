@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Component
-public class CidadeAssembler {
+public class  CidadeAssembler {
 
     private final ModelMapper mapper;
 

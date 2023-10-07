@@ -1,6 +1,5 @@
 package com.apiteste.apiteste.resources.comum;
 
-import com.apiteste.apiteste.dto.ClienteDTO;
 import com.apiteste.apiteste.dto.EstadoDTO;
 import com.apiteste.apiteste.services.comum.EstadoService;
 import lombok.AllArgsConstructor;

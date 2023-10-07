@@ -1,0 +1,45 @@
+version: "3.9"
+
+networks:
+  apiteste-network:
+    driver: bridge
+
+services:
+  apiteste-mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD:
+    ports:
+      - "13306:3306"
+    networks:
+      - apiteste-network
+
+  apiteste-redis:
+    image: redis:6.2.1-alpine
+    networks:
+      - apiteste-network
+
+  apiteste-api:
+    image: apiteste-api
+    command: ["/wait-for-it.sh", "apiteste-mysql:3306", "-t", "30", "--", "java", "-jar", "api.jar"]
+    environment:
+      DB_HOST: apiteste-mysql
+      SPRING_SESSION_STORE_TYPE: redis
+      SPRING_REDIS_HOST: apiteste-redis
+      SPRING_PROFILES_ACTIVE: development
+    networks:
+      - apiteste-network
+    depends_on:
+      - apiteste-mysql
+
+#  apiteste-proxy:
+#    build: ./nginx
+#    image: apiteste-proxy
+#    ports:
+#      - "80:80"
+#    networks:
+#      - apiteste-network
+#    depends_on:
+#      - apiteste-api

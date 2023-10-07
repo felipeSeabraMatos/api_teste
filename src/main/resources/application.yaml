@@ -5,7 +5,7 @@ spring:
   application:
     name: api-teste
   datasource:
-    url:  jdbc:mysql://localhost:8111/apiteste2
+    url:  jdbc:mysql://${DB_HOST:localhost}/apiteste2?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: root
     password:
   jpa:
